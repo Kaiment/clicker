@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
-import Work from './components/Work/Work';
+import Producer from './components/Work/Producer';
 import './App.css';
+
+interface producer {
+  key: number,
+  name: string,
+  work_count: number,
+  prod: number,
+  price: number,
+}
 
 interface IState {
   neuron_count: number;
   neuron_prod: number;
-  work_count: number;
+  producers: [producer, producer],
 }
 
 class App extends Component<{}, IState> {
@@ -17,7 +25,10 @@ class App extends Component<{}, IState> {
   public readonly state: Readonly<IState> = {
     neuron_count: 0,
     neuron_prod: 0,
-    work_count: 0,
+    producers: [
+      { key: 0, name: 'Work', work_count: 0, prod: 1, price: 2 },
+      { key: 1, name: 'Book', work_count: 0, prod: 5, price: 50 },
+    ]
   };
 
   private add_neuron() {
@@ -26,11 +37,11 @@ class App extends Component<{}, IState> {
     }))
   };
 
-  private add_work(price: number) {
+  private add_work(id: number, price: number, prod: number) {
+    this.state.producers.map(p => p.key === id ? p.work_count += 1 : p.work_count);
     this.setState(state => ({
-      work_count: state.work_count + 1,
       neuron_count: state.neuron_count - price,
-      neuron_prod: this.state.neuron_prod + 1,
+      neuron_prod: this.state.neuron_prod + prod,
     }))
   }
 
@@ -43,7 +54,10 @@ class App extends Component<{}, IState> {
   }
 
   render() {
-    const { neuron_count, neuron_prod, work_count } = this.state;
+    const { neuron_count, neuron_prod } = this.state;
+    const producers_list = this.state.producers.map((p) =>
+      <Producer key={ p.key } id={ p.key } name={ p.name } neuron_count={ neuron_count } work_count={ p.work_count } add_work={ this.add_work.bind(this) } prod={p.prod} price={p.price} />
+    )
 
     return (
       <div className="App">
@@ -51,10 +65,10 @@ class App extends Component<{}, IState> {
         <div>
           <div>{ neuron_count } neurons</div>
           <div>{ neuron_prod } per second</div>
-          <h1 onClick={ this.add_neuron }>BRAIN</h1>
+          <h1 onClick={ this.add_neuron } className='brain noselect'>BRAIN</h1>
         </div>
         <div>
-          <Work neuron_count={ neuron_count } work_count={ work_count } add_work={ this.add_work.bind(this) } />
+          {producers_list}
         </div>
       </div>
       </div>

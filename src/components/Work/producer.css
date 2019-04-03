@@ -1,0 +1,15 @@
+.producer {
+  margin: 5px 0;
+}
+
+.available {
+  background-color: #9fe995;
+}
+
+.unavailable {
+  background-color: #f09393;
+}
+
+.prod_name {
+  font-weight: bold;
+}
