@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import helpers from '../../helpers';
 import './producer.css';
 import '../../App.css';
 
@@ -44,8 +45,8 @@ export default class Work extends Component<IProps, IState> {
     return (
       <div onClick={this.addWork} className={ neuron_count >= price ? "available producer" : "unavailable producer"}>
         <div className='prod_name noselect'>{ name }</div>
-        <div className='noselect'>price: { price }</div>
-        <div className='noselect'>count: { this.props.work_count }</div>
+        <div className='noselect'>price: { helpers.numberWithCommas(price) }</div>
+        <div className='noselect'>count: { helpers.numberWithCommas(this.props.work_count) }</div>
       </div>
     )
   }

@@ -6,8 +6,21 @@
   background-color: #9fe995;
 }
 
+.available:hover {
+  background-color: #bdf1b6;
+  cursor: pointer;
+}
+
+.available:active {
+  background-color: #d3f5cf;
+}
+
 .unavailable {
   background-color: #f09393;
+}
+
+.unavailable:hover {
+  background-color: #f37d7d;
 }
 
 .prod_name {

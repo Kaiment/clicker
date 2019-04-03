@@ -45,6 +45,11 @@
   background-color: #eeb1e4;
 }
 
+.brain:hover {
+  background-color: #f1bee9;
+  cursor: pointer;
+}
+
 .brain:active {
   background-color: #ffd0f6;
 }
