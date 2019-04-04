@@ -8,18 +8,17 @@ import './App.css';
 interface producer {
   key: number,
   name: string,
-  work_count: number,
-  prod_value: number,
-  prod: number,
   price: number,
-  mult_count: number,
-  mult_price: number,
+  multiplicator_price: number,
+  prod: number,
+  base_prod: number,
+  count: number,
 }
 
 interface IState {
   neuron_count: number;
   neuron_prod: number;
-  producers: [producer, producer, producer, producer, producer, producer, producer], 
+  producers: [producer, producer, producer, producer, producer, producer], 
 }
 
 class App extends Component<{}, IState> {
@@ -32,22 +31,24 @@ class App extends Component<{}, IState> {
     neuron_count: 0,
     neuron_prod: 0,
     producers: [
-      { key: 0, name: 'Work', work_count: 0, prod_value: 0, prod: 1, price: 2, mult_count: 1, mult_price: 10 },
-      { key: 1, name: 'Book', work_count: 0, prod_value: 0, prod: 16, price: 42, mult_count: 1, mult_price: 1000 },
-      { key: 2, name: 'Youtube video', work_count: 0, prod_value: 0, prod: 32, price: 101, mult_count: 1, mult_price: 10000 },
-      { key: 3, name: 'Github and Stack Overflow', work_count: 0, prod_value: 0, prod: 375, price: 4004, mult_count: 1, mult_price: 100000 },
-      { key: 4, name: 'Attend to a Flat earther conference', work_count: 0, prod_value: 0, prod: 3600, price: 84000, mult_count: 1, mult_price: 10000000 },
-      { key: 5, name: 'Using Google', work_count: 0, prod_value: 0, prod: 400413, price: 1040404, mult_count: 1, mult_price: 1000000000 },
-      { key: 6, name: 'Cerebral chip', work_count: 0, prod_value: 0, prod: 5120000, price: 36021666, mult_count: 1, mult_price: 999999999 },
-    ]
+      { key: 0, name: 'Working', price: 2, multiplicator_price: 4, prod: 1, base_prod: 1, count: 0 },
+      { key: 1, name: 'Reading a book', price: 41, multiplicator_price: 125, prod: 16, base_prod: 16, count: 0 },
+      { key: 2, name: 'Reading the documentation', price: 101, multiplicator_price: 255, prod: 64, base_prod: 64, count: 0 },
+      { key: 3, name: 'Test and retry', price: 1024, multiplicator_price: 1500, prod: 256, base_prod: 256, count: 0 },
+      { key: 4, name: 'Copy/pasting from Github', price: 10338, multiplicator_price: 26000, prod: 1337, base_prod: 1337, count: 0 },
+      { key: 5, name: 'Stealing someone\'s code and pretending it\'s yours', price: 420101, multiplicator_price: 1000000, prod: 37197, base_prod: 37197, count: 0 },
+    ],
   };
 
-  private calc_prod() {
-    let total_prod = 0;
-    this.state.producers.forEach(producer => {
-      total_prod += producer.prod_value * producer.mult_count;
+  private compute_production() {
+    const { producers } = this.state;
+    let total_production = 0;
+    producers.forEach(producer => {
+      total_production += producer.prod * producer.count;
     });
-    return total_prod;
+    this.setState(state => ({
+      neuron_prod: total_production,
+    }));
   }
 
   private add_neuron() {
@@ -56,22 +57,24 @@ class App extends Component<{}, IState> {
     }))
   };
 
-  private add_work(id: number, price: number, prod: number) {
-    this.state.producers.map(p => p.key === id ? p.work_count += 1 : p.work_count);
-    this.state.producers.map(p => p.key === id ? p.prod_value += p.prod : p.prod_value);
-    this.setState(state => ({
-      neuron_count: state.neuron_count - price,
-      neuron_prod: this.calc_prod(),
+  private async add_work(id: number) {
+    const { producers, neuron_count } = this.state;
+    await this.setState(state => ({
+      neuron_count: neuron_count - producers[id].price,
     }))
+    producers[id].count += 1;
+    producers[id].price = Math.ceil(producers[id].price * 1.3);
+    this.compute_production();
   }
 
-  private add_multiplicator(id: number, price: number) {
-    this.setState(state => ({
-      neuron_count: state.neuron_count - price,
-      neuron_prod: this.calc_prod(),
-    }))
-    this.state.producers.map(p => p.key === id ? p.mult_count += 1 : p.mult_count)
-    this.state.producers.map(p => p.key === id ? p.prod *= p.mult_count : p.prod)
+  private async add_multiplicator(id: number) {
+    const { producers, neuron_count } = this.state;
+    await this.setState(state => ({
+      neuron_count: state.neuron_count - producers[id].multiplicator_price,
+    }));
+    producers[id].prod += producers[id].base_prod;
+    producers[id].multiplicator_price = Math.ceil(producers[id].multiplicator_price * 2.3);
+    this.compute_production(); 
   }
 
   componentDidMount() {
@@ -85,10 +88,10 @@ class App extends Component<{}, IState> {
   render() {
     const { neuron_count, neuron_prod } = this.state;
     const producers_list = this.state.producers.map((p) =>
-      <Producer key={ p.key } id={ p.key } name={ p.name } neuron_count={ neuron_count } work_count={ p.work_count } add_work={ this.add_work.bind(this) } prod={p.prod} price={p.price} />
+      <Producer key={p.key} id={p.key} name={p.name} price={p.price} prod={p.prod} count={p.count} neuron_count={neuron_count} add_work={this.add_work.bind(this)} />
     )
     const multiplicators_list = this.state.producers.map((p) =>
-      <Multiplicator key={ p.key } id={ p.key } name={ p.name } neuron_count={ neuron_count } mult_count={ p.mult_count } add_multiplicator={ this.add_multiplicator.bind(this) } price={ p.mult_price } />
+      <Multiplicator key={p.key} id={p.key} name={p.name} price={p.multiplicator_price} neuron_count={neuron_count} add_multiplicator={this.add_multiplicator.bind(this)} />
     )
 
     return (
