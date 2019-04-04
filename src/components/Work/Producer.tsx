@@ -5,6 +5,7 @@ import '../../App.css';
 
 interface IState {
   price: number,
+  prod_value: number,
 }
 
 interface IProps {
@@ -26,26 +27,28 @@ export default class Work extends Component<IProps, IState> {
 
   public readonly state: Readonly<IState> = {
     price: this.props.price,
+    prod_value: 0,
   }
 
   private addWork() {
-    const { price } = this.state;
+    const { price, prod_value } = this.state;
     const { prod, id } = this.props;
     if (this.props.neuron_count >= this.state.price) {
-      this.props.add_work(id, price, prod);
       this.setState(state => ({
+        prod_value: state.prod_value + prod,
         price: Math.ceil(state.price * 1.2),
       }))
+      this.props.add_work(id, price, prod_value);
     }
   }
 
   public render() {
     const { price } = this.state;
-    const { neuron_count, name } = this.props;
+    const { neuron_count, name, prod } = this.props;
     return (
       <div onClick={this.addWork} className={ neuron_count >= price ? "available producer" : "unavailable producer"}>
         <div className='prod_name noselect'>{ name }</div>
-        <div className='noselect'>price: { helpers.numberWithCommas(price) }</div>
+        <div className='noselect'>price: { helpers.numberWithCommas(price) }, prod: { helpers.numberWithCommas(prod) } per second</div>
         <div className='noselect'>count: { helpers.numberWithCommas(this.props.work_count) }</div>
       </div>
     )
